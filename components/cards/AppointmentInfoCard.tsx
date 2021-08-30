@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, Alert } from 'react-native';
-import Appointment from '../../models/appointment';
+import { connect } from 'react-redux';
+import { removeAppointment } from '../../store/appointments';
 
-export default function AppointmentInfoCard({ item, setAppointments }: any) {
+const AppointmentInfoCard = ({ item, removeAppointment }: any) => {
     const handleDelete = (id: number) => {
         Alert.alert(
             "¿Estas seguro/a?",
@@ -10,9 +11,7 @@ export default function AppointmentInfoCard({ item, setAppointments }: any) {
             [
                 {
                     text: "Si",
-                    onPress: () => {
-                        setAppointments((items: Appointment[]) => items.filter(x => x._id !== id));
-                    },
+                    onPress: () => removeAppointment(id)
                 },
                 {
                     text: "No",
@@ -20,18 +19,23 @@ export default function AppointmentInfoCard({ item, setAppointments }: any) {
             ])
     }
 
-    return (
+    return (item && item.patient &&
         <View style={styles.card} key={item._id}>
             <Text style={styles.title}>Paciente:</Text>
-            <Text>{item.patient}</Text>
+            <Text>{item.patient.fullname}</Text>
             <Text style={styles.title}>Síntomas: </Text>
-            <Text>{item.symptoms}</Text>
+            <Text>{item.patient.symptoms}</Text>
             <View>
                 <TouchableHighlight onPress={() => handleDelete(item._id)} style={styles.delButton}>
                     <Text style={styles.delText}>Remover cita</Text>
                 </TouchableHighlight>
             </View>
-        </View>);
+        </View>
+    );
+}
+
+const mapDispatchToProps = {
+    removeAppointment
 }
 
 const styles = StyleSheet.create({
@@ -59,3 +63,5 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     }
 });
+
+export default connect(null, mapDispatchToProps)(AppointmentInfoCard);
